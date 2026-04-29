@@ -1,10 +1,31 @@
 ﻿using HarmonyLib;
 using Hazel;
+using HydraMenu.anticheat.rpc;
+using System.Collections.Generic;
 
 namespace HydraMenu.anticheat
 {
 	internal class Anticheat
 	{
+		public static bool Enabled { get; set; } = true;
+
+		public static Dictionary<RpcCalls, RpcCheck> RpcHandlers = new Dictionary<RpcCalls, RpcCheck>()
+		{
+			// RPC handlers in this dictionary should be sorted by their RPC ID
+			{ RpcCalls.PlayAnimation, new PlayAnimation() },
+			{ RpcCalls.CompleteTask, new CompleteTask() },
+			{ RpcCalls.SetScanner, new SetScanner() },
+			{ RpcCalls.SetStartCounter, new SetStartCounter() },
+			{ RpcCalls.EnterVent, new EnterVent() },
+			{ RpcCalls.ExitVent, new ExitVent() },
+			{ RpcCalls.SnapTo, new SnapTo() },
+			{ RpcCalls.CloseDoorsOfType, new CloseDoorsOfType() },
+			{ RpcCalls.UpdateSystem, new UpdateSystem() },
+			{ RpcCalls.SetLevel, new SetLevel() },
+		};
+
+		public static bool CheckSpoofedPlatforms { get; set; } = true;
+
 		public enum Punishments
 		{
 			None,
@@ -12,19 +33,6 @@ namespace HydraMenu.anticheat
 			ErrorKick,
 			Ban
 		}
-
-		public static bool Enabled { get; set; } = true;
-
-		public static bool CheckSpoofedPlatforms { get; set; } = true;
-		public static bool CheckSpoofedLevels { get; set; } = true;
-		public static bool CheckInvalidCloseDoors { get; set; } = true;
-		public static bool CheckInvalidCompleteTask { get; set; } = true;
-		public static bool CheckInvalidPlayAnimation { get; set; } = true;
-		public static bool CheckInvalidScan { get; set; } = true;
-		public static bool CheckInvalidSnapTo { get; set; } = true;
-		public static bool CheckInvalidStartCounter { get; set; } = true;
-		public static bool CheckInvalidSystemUpdates { get; set; } = true;
-		public static bool CheckInvalidVent { get; set; } = true;
 
 		public static float NotificationDuration = 10.0f;
 
@@ -36,32 +44,25 @@ namespace HydraMenu.anticheat
 		{
 			static bool Prefix(PlayerControl __instance, byte callId, MessageReader reader)
 			{
-				int oldReadPosition = reader.Position;
 				RpcCalls RpcId = (RpcCalls)callId;
-
-				bool blockRpc = false;
-				switch(RpcId)
+				if(!RpcHandlers.TryGetValue(RpcId, out RpcCheck rpcCheck))
 				{
-					case RpcCalls.PlayAnimation:
-						InvalidPlayAnimation.OnPlayAnimation(__instance, reader, ref blockRpc);
-						break;
-
-					case RpcCalls.CompleteTask:
-						InvalidCompleteTask.OnCompleteTask(__instance, reader, ref blockRpc);
-						break;
-
-					case RpcCalls.SetLevel:
-						InvalidSetLevel.OnSetLevel(__instance, reader, ref blockRpc);
-						break;
-
-					case RpcCalls.SetScanner:
-						InvalidScanner.OnSetScanner(__instance, reader, ref blockRpc);
-						break;
-
-					case RpcCalls.SetStartCounter:
-						InvalidStartCounter.OnSetStartCounter(__instance, reader, ref blockRpc);
-						break;
+					return true;
 				}
+
+				if(!Enabled || !rpcCheck.Enabled) return true;
+
+				// Only we, the host, should be sending host-only RPCs
+				if(AmongUsClient.Instance.AmHost && rpcCheck.IsHostOnly())
+				{
+					Flag(__instance, $"Sending RPC {RpcId} while non-host");
+					return false;
+				}
+
+				int oldReadPosition = reader.Position;
+				bool blockRpc = false;
+
+				rpcCheck.Validate(__instance, reader, ref blockRpc);
 
 				if(DiscardRPC && !blockRpc)
 				{
@@ -81,21 +82,19 @@ namespace HydraMenu.anticheat
 		{
 			static bool Prefix(PlayerPhysics __instance, byte callId, MessageReader reader)
 			{
-				int oldReadPosition = reader.Position;
-				RpcCalls RpcId = (RpcCalls)callId;
 				PlayerControl player = __instance.myPlayer;
-
-				bool blockRpc = false;
-				switch(RpcId)
+				RpcCalls RpcId = (RpcCalls)callId;
+				if(!RpcHandlers.TryGetValue(RpcId, out RpcCheck rpcCheck))
 				{
-					case RpcCalls.EnterVent:
-						InvalidVent.OnPlayerEnterVent(player, reader, ref blockRpc);
-						break;
-
-					case RpcCalls.ExitVent:
-						InvalidVent.OnPlayerExitVent(player, reader, ref blockRpc);
-						break;
+					return true;
 				}
+
+				if(!Enabled || !rpcCheck.Enabled) return true;
+
+				int oldReadPosition = reader.Position;
+				bool blockRpc = false;
+
+				rpcCheck.Validate(player, reader, ref blockRpc);
 
 				if(DiscardRPC && !blockRpc)
 				{
@@ -115,17 +114,19 @@ namespace HydraMenu.anticheat
 		{
 			static bool Prefix(CustomNetworkTransform __instance, byte callId, MessageReader reader)
 			{
-				int oldReadPosition = reader.Position;
-				RpcCalls RpcId = (RpcCalls)callId;
 				PlayerControl player = __instance.myPlayer;
-
-				bool blockRpc = false;
-				switch(RpcId)
+				RpcCalls RpcId = (RpcCalls)callId;
+				if(!RpcHandlers.TryGetValue(RpcId, out RpcCheck rpcCheck))
 				{
-					case RpcCalls.SnapTo:
-						InvalidSnapTo.OnSnapTo(player, reader, ref blockRpc);
-						break;
+					return true;
 				}
+
+				if(!Enabled || !rpcCheck.Enabled) return true;
+
+				int oldReadPosition = reader.Position;
+				bool blockRpc = false;
+
+				rpcCheck.Validate(player, reader, ref blockRpc);
 
 				if(DiscardRPC && !blockRpc)
 				{
@@ -145,20 +146,18 @@ namespace HydraMenu.anticheat
 		{
 			static bool Prefix(ShipStatus __instance, byte callId, MessageReader reader)
 			{
-				int oldReadPosition = reader.Position;
 				RpcCalls RpcId = (RpcCalls)callId;
-
-				bool blockRpc = false;
-				switch(RpcId)
+				if(!RpcHandlers.TryGetValue(RpcId, out RpcCheck rpcCheck))
 				{
-					case RpcCalls.CloseDoorsOfType:
-						InvalidCloseDoors.OnDoorClose(reader, ref blockRpc);
-						break;
-
-					case RpcCalls.UpdateSystem:
-						InvalidSystemUpdates.OnSystemUpdate(reader, ref blockRpc);
-						break;
+					return true;
 				}
+
+				if(!Enabled || !rpcCheck.Enabled) return true;
+
+				int oldReadPosition = reader.Position;
+				bool blockRpc = false;
+
+				rpcCheck.Validate(null, reader, ref blockRpc);
 
 				if(DiscardRPC && !blockRpc)
 				{

@@ -46,7 +46,7 @@ namespace HydraMenu
 			foreach(PlayerControl player in allPlayers)
 			{
 				if(
-					(excludeSelf && player.PlayerId == PlayerControl.LocalPlayer.PlayerId) ||
+					(excludeSelf && AmongUsClient.Instance.ClientId == player.OwnerId) ||
 					(excludeHost && AmongUsClient.Instance.HostId == player.OwnerId) ||
 					(excludeDead && player.Data.IsDead) ||
 					(excludeImposters && player.Data.Role.CanUseKillButton)

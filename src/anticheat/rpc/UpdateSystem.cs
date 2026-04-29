@@ -3,9 +3,9 @@ using InnerNet;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HydraMenu.anticheat
+namespace HydraMenu.anticheat.rpc
 {
-	internal class InvalidSystemUpdates : ICheck
+	internal class UpdateSystem : RpcCheck
 	{
 		// TODO: Maybe change the variable name to something shorter lol?
 		private static readonly SystemTypes[] SystemsThatCanBeUpdatedWhenDead = {
@@ -15,12 +15,10 @@ namespace HydraMenu.anticheat
 			SystemTypes.Security
 		};
 
-		public static void OnSystemUpdate(MessageReader reader, ref bool blockRpc)
+		public override void Validate(PlayerControl player, MessageReader reader, ref bool blockRpc)
 		{
-			if(!Anticheat.Enabled || !Anticheat.CheckInvalidSystemUpdates) return;
-
 			SystemTypes system = (SystemTypes)reader.ReadByte();
-			PlayerControl player = reader.ReadNetObject<PlayerControl>();
+			player = reader.ReadNetObject<PlayerControl>();
 
 			if(!ShipStatus.Instance.Systems.ContainsKey(system))
 			{
@@ -110,6 +108,11 @@ namespace HydraMenu.anticheat
 				Hydra.Log.LogInfo($"Blocked switch update from {player.Data.PlayerName} as lights are not currently sabotaged");
 				blockRpc = true;
 			}
+		}
+
+		public override RpcCalls GetRpcCall()
+		{
+			return RpcCalls.UpdateSystem;
 		}
 	}
 }

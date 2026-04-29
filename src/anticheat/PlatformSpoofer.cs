@@ -3,7 +3,7 @@ using InnerNet;
 
 namespace HydraMenu.anticheat
 {
-	internal class PlatformSpoofer : ICheck
+	internal class PlatformSpoofer
 	{
 		[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
 		class PlatformSpoof
