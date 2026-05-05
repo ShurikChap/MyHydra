@@ -16,6 +16,7 @@ namespace HydraMenu.anticheat
 			{ RpcCalls.CompleteTask, new CompleteTask() },
 			{ RpcCalls.Exiled, new Exiled() },
 			{ RpcCalls.CheckName, new CheckName() },
+			{ RpcCalls.SetName, new SetName() },
 			{ RpcCalls.SetScanner, new SetScanner() },
 			{ RpcCalls.SetStartCounter, new SetStartCounter() },
 			{ RpcCalls.EnterVent, new EnterVent() },
