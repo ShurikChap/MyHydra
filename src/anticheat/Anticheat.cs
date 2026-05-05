@@ -27,7 +27,7 @@ namespace HydraMenu.anticheat
 			{ RpcCalls.CloseDoorsOfType, new CloseDoorsOfType() },
 			{ RpcCalls.ClimbLadder, new ClimbLadder() },
 			{ RpcCalls.UpdateSystem, new UpdateSystem() },
-			{ RpcCalls.SetLevel, new SetLevel() },
+			{ RpcCalls.SetLevel, new SetLevel() }
 		};
 
 		public static bool CheckSpoofedPlatforms { get; set; } = true;

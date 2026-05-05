@@ -15,7 +15,7 @@ namespace HydraMenu.anticheat.rpc
 			}
 
 			MapNames map = Utilities.GetCurrentMap();
-			if(map != MapNames.Fungle)
+			if(map != MapNames.Airship && map != MapNames.Fungle)
 			{
 				Anticheat.Flag(player, $"{player.Data.PlayerName} tried to climb a ladder outside of the proper map.");
 				blockRpc = true;
