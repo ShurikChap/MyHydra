@@ -39,7 +39,7 @@ namespace HydraMenu.ui
 			get { return new Vector2(windowPosition.x, windowPosition.y + HeaderSize.y); }
 		}
 
-		public static Vector2 SectionButtonSizes
+		public static Vector2 SectionButtonSize
 		{
 			get { return new Vector2(SectionListSize.x, 25); }
 		}
@@ -102,7 +102,7 @@ namespace HydraMenu.ui
 				ISection section = sections[i];
 
 				// Add the tab to the left-pane
-				RenderTabs(i, section);
+				RenderTab(i, section);
 
 				if(i == activeTab)
 				{
@@ -156,13 +156,13 @@ namespace HydraMenu.ui
 				mousePos.y <= (windowPosition.y + windowSize.y);
 		}
 
-		private void RenderTabs(byte position, ISection section)
+		private void RenderTab(byte position, ISection section)
 		{
 			Rect rect = new Rect(
 				SectionListPosition.x,
-				SectionListPosition.y + (position * SectionButtonSizes.y),
-				SectionButtonSizes.x,
-				SectionButtonSizes.y
+				SectionListPosition.y + (position * SectionButtonSize.y),
+				SectionButtonSize.x,
+				SectionButtonSize.y
 			);
 
 			GUIStyle style = activeTab == position ? Styles.SectionBoxActive : Styles.SectionBox;
