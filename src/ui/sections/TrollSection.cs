@@ -22,16 +22,6 @@ namespace HydraMenu.ui.sections
 			Troll.BlockSabotages.Enabled = GUILayout.Toggle(Troll.BlockSabotages.Enabled, "Block Sabotages");
 			Troll.BlockVenting.Enabled = GUILayout.Toggle(Troll.BlockVenting.Enabled, "Disable Vents");
 
-			if(GUILayout.Button("Fuck Start Timer"))
-			{
-				System.Random rnd = new System.Random();
-				int counter = rnd.Next(-128, 127);
-
-				// This function takes in an int, however in the networking protocol the value is a signed byte
-				PlayerControl.LocalPlayer.RpcSetStartCounter(counter);
-				GameStartManager.Instance.SetStartCounter((sbyte)counter);
-			}
-
 			if(GUILayout.Button("Trigger All Spores"))
 			{
 				if(Utilities.GetCurrentMap() != MapNames.Fungle)
