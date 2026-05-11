@@ -11,17 +11,17 @@ namespace HydraMenu.ui
 
 		public static Vector2 BoxSize
 		{
-			get { return new Vector2(325, 90); }
+			get { return new Vector2(325, 90) * MainUI.scale; }
 		}
 
 		public static Vector2 BoxHeaderSize
 		{
-			get { return new Vector2(BoxSize.x, 17); }
+			get { return new Vector2(BoxSize.x, 17 * MainUI.scale); }
 		}
 
 		public static Vector2 BoxContentPadding
 		{
-			get { return new Vector2(10, 0); }
+			get { return new Vector2(10, 0) * MainUI.scale; }
 		}
 
 		public static Vector2 BoxContentSize
@@ -31,7 +31,7 @@ namespace HydraMenu.ui
 
 		public static Vector2 BoxSliderSize
 		{
-			get { return new Vector2(BoxSize.x, 20); }
+			get { return new Vector2(BoxSize.x, 20 * MainUI.scale); }
 		}
 
 		public void Update()
