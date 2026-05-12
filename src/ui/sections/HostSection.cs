@@ -58,7 +58,7 @@ namespace HydraMenu.ui.sections
 			}
 
 			GUILayout.BeginHorizontal();
-			if(GUILayout.Button("Force Crewmate Victory") )
+			if(GUILayout.Button("Force Crewmate Victory"))
 			{
 				// Just incase the user has this enabled
 				Host.DisableGameEnd.Enabled = false;

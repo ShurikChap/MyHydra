@@ -35,7 +35,7 @@ namespace HydraMenu.features
 					return false;
 				} else
 				{
-					return false;
+					return true;
 				}
 			}
 		}

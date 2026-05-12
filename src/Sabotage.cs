@@ -186,7 +186,7 @@ namespace HydraMenu
 			switch(system)
 			{
 				// ShipStatus::RepairCriticalSabotages uses amount value of 16 to insta fix sabotages
-				// This amount value should only be send by the host, so this can be detected by anticheats
+				// This amount value should only be sent by the host, so this can be detected by anticheats
 				case SystemTypes.Reactor:
 				case SystemTypes.Laboratory:
 				case SystemTypes.LifeSupp:

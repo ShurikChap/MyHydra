@@ -111,7 +111,7 @@ namespace HydraMenu.ui.sections
 
 		private static void RenderPlayerControls(PlayerControl target)
 		{
-			if(target == null)
+			if(target == null || target.Data == null)
 			{
 				GUILayout.Label("Specified target is not valid.");
 				return;

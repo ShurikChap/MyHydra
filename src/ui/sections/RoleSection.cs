@@ -14,27 +14,6 @@ namespace HydraMenu.ui.sections
 
 		private RoleTypes selectedRole = RoleTypes.Crewmate;
 
-		// The RoleTypes enum has some weird gaps, like everything from Crewmate (0) to Tracker (10) is normal, but then Detective is 12 and Viper is 18
-		// https://www.innersloth.com/2026-roadmap-part-1/
-		// The Among Us 2026 roadmap does state that there are currently 15 prototype roles in the works,
-		// could these gaps be attributed to roles that have not been added to the retail version of the game?
-		public readonly Dictionary<byte, RoleTypes> roles = new Dictionary<byte, RoleTypes>()
-		{
-			{ 0, RoleTypes.Crewmate },
-			{ 1, RoleTypes.Impostor },
-			{ 2, RoleTypes.Scientist},
-			{ 3, RoleTypes.Engineer},
-			{ 4, RoleTypes.GuardianAngel },
-			{ 5, RoleTypes.Shapeshifter },
-			{ 6, RoleTypes.Noisemaker },
-			{ 7, RoleTypes.Phantom },
-			{ 8, RoleTypes.Tracker },
-			{ 9, RoleTypes.Detective },
-			{ 10, RoleTypes.Viper },
-			{ 11, RoleTypes.CrewmateGhost },
-			{ 12, RoleTypes.ImpostorGhost }
-		};
-
 		public override void Render()
 		{
 			Roles.AllowVentingForCrewmates = GUILayout.Toggle(Roles.AllowVentingForCrewmates, "Vent As Crewmate");

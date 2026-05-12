@@ -86,7 +86,7 @@ namespace HydraMenu.features
 
 			static void Prefix(PlayerControl __instance, uint level)
 			{
-				if(!Enabled || !AmongUsClient.Instance.AmHost || __instance.PlayerId == PlayerControl.LocalPlayer.PlayerId|| level > MinLevel) return;
+				if(!Enabled || !AmongUsClient.Instance.AmHost || __instance == PlayerControl.LocalPlayer || level > MinLevel) return;
 
 				Hydra.notifications.Send("Block Low Levels", $"{__instance.Data.PlayerName} is level {level}, which is below the level threshold. They will be kicked from the game.");
 				AmongUsClient.Instance.KickPlayer(__instance.OwnerId, false);
