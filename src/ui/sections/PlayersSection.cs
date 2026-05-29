@@ -156,16 +156,7 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Murder"))
 			{
-				if(AmongUsClient.Instance.AmHost)
-				{
-					Hydra.Log.LogInfo($"Attempting to kill {target.Data.PlayerName}, we are host so we are using the MurderPlayer RPC");
-					PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
-				}
-				else
-				{
-					Hydra.Log.LogInfo($"Attempting to kill {target.Data.PlayerName}, we are not the host so we have to use the CheckMurder RPC");
-					PlayerControl.LocalPlayer.CmdCheckMurder(target);
-				}
+				AttemptMurder(target);
 			}
 
 			if(GUILayout.Button("Copy Avatar"))
@@ -326,6 +317,52 @@ namespace HydraMenu.ui.sections
 			{
 				target.RpcSetColor((byte)selectedColor);
 			}
+		}
+
+		private static void AttemptMurder(PlayerControl target)
+		{
+			bool hasAnticheat = Utilities.IsAnticheatPresent();
+
+			if(hasAnticheat && ShipStatus.Instance == null)
+			{
+				Hydra.notifications.Send("Murder Player", $"You can only kill players once the game has started.");
+				return;
+			}
+
+			if(AmongUsClient.Instance.AmHost)
+			{
+				Hydra.Log.LogInfo($"Attempting to murder {target.Data.PlayerName}, we are the host so we can use the MurderPlayer RPC");
+				PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
+				Hydra.notifications.Send("Murder Player", $"Killed {target.Data.PlayerName}.", 5);
+				return;
+			}
+
+			if(!hasAnticheat)
+			{
+				Hydra.Log.LogInfo($"Attempting to murder {target.Data.PlayerName}, we are are in a host-authoritative lobby so we can use the MurderPlayer RPC");
+				PlayerControl.LocalPlayer.RpcMurderPlayer(target, true);
+				Hydra.notifications.Send("Murder Player", $"Killed {target.Data.PlayerName}.", 5);
+				return;
+			}
+
+			Hydra.Log.LogInfo($"Attempting to kill {target.Data.PlayerName}, we are not the host so we have to use the CheckMurder RPC");
+
+			// The CheckMurder RPC handler will not authorize kills if you are not the imposter or you are inside of a meeting
+			// There are more checks, but I do not think it is worth adding them all here
+			if(!RoleManager.IsImpostorRole(PlayerControl.LocalPlayer.Data.RoleType))
+			{
+				Hydra.notifications.Send("Murder Player", "You can only murder players when you are an Impostor, unless you are the host of the lobby.");
+				return;
+			}
+
+			if(MeetingHud.Instance != null)
+			{
+				Hydra.notifications.Send("Murder Player", "You can only murder players outside of meetings, unless you are the host of the lobby.");
+				return;
+			}
+
+			Hydra.notifications.Send("Murder Player", $"Attempted to kill {target.Data.PlayerName}.", 5);
+			PlayerControl.LocalPlayer.CmdCheckMurder(target);
 		}
 
 		private static void AttemptReportBody(PlayerControl target)
