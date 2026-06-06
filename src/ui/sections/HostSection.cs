@@ -197,7 +197,7 @@ namespace HydraMenu.ui.sections
 			{
 				if(player == target || player.shapeshiftTargetPlayerId == target.PlayerId) continue;
 
-				Utilities.ShapeshiftPlayer(player, player);
+				Utilities.ShapeshiftPlayer(player, target);
 
 				// This function can send up to 15 reliable messages at once, so we need to implement a delay to avoid kicks
 				yield return Effects.Wait(0.05f);
