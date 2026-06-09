@@ -122,7 +122,7 @@ namespace HydraMenu.ui
 				}
 			}
 
-			// If the amount of teleport locations does not divide into the amount of colums per row then we won't be ending the horizontal layout
+			// If the amount of buttons does not divide into the amount of colums per row then we won't be ending the horizontal layout
 			// so we check if we need to end it here
 			if(currentColumn != 0)
 			{
