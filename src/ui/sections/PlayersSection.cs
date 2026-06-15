@@ -165,7 +165,7 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Report Body"))
 			{
-				AttemptReportBody(target);
+				Utilities.AttemptStartMeeting(PlayerControl.LocalPlayer, target.Data);
 			}
 
 			GUILayout.Space(5);
@@ -176,7 +176,7 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Force Meeting As"))
 			{
-				Utilities.OpenMeeting(target, null);
+				Utilities.AttemptStartMeeting(target, null);
 			}
 
 			GUILayout.BeginHorizontal();
@@ -371,58 +371,6 @@ namespace HydraMenu.ui.sections
 
 			Hydra.notifications.Send("Murder Player", $"Attempted to kill {target.Data.PlayerName}.", 5);
 			PlayerControl.LocalPlayer.CmdCheckMurder(target);
-		}
-
-		private static void AttemptReportBody(PlayerControl target)
-		{
-			if(AmongUsClient.Instance.AmHost)
-			{
-				Hydra.Log.LogInfo($"Attempting to report {target.Data.PlayerName}'s body, we are the host so we directly use the StartMeeting RPC");
-				Utilities.OpenMeeting(PlayerControl.LocalPlayer, target.Data);
-				return;
-			}
-
-			Hydra.Log.LogInfo($"Attempting to report {target.Data.PlayerName}'s body, we are not the host so we have to use the ReportDeadBody RPC");
-
-			if(Utilities.IsAnticheatPresent())
-			{
-				if(AmongUsClient.Instance.GameState != InnerNetClient.GameStates.Started)
-				{
-					Hydra.notifications.Send("Report Body", "The game must have started for this option to work.");
-					return;
-				}
-
-				if(!target.Data.IsDead)
-				{
-					Hydra.notifications.Send("Report Body", "You can only report bodies of players who have died in this round.");
-					return;
-				}
-
-				bool bodyExists = false;
-				// Loop over every single dead body that exists and check if it matches our target's player id
-				// From PlayerControl::ReportClosest
-				foreach(Collider2D collider in Physics2D.OverlapCircleAll(new Vector2(0, 0), 99999f, Constants.PlayersOnlyMask))
-				{
-					if(collider.tag != "DeadBody") continue;
-
-					DeadBody bodyComponent = collider.GetComponent<DeadBody>();
-					if(bodyComponent && bodyComponent.ParentId == target.PlayerId)
-					{
-						bodyExists = true;
-						break;
-					}
-				}
-
-				if(!bodyExists)
-				{
-					Hydra.notifications.Send("Report Body", "Unable to find a dead body for this player, you can only report a player's body if they have died this round and their body has not dissolved.");
-					return;
-				}
-			}
-
-			Hydra.Log.LogInfo($"All checks passed, we are able to report {target.Data.PlayerName}'s body.");
-
-			PlayerControl.LocalPlayer.CmdReportDeadBody(target.Data);
 		}
 
 		private static IEnumerator AttemptFrameForKillingAll(PlayerControl target)

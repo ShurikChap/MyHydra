@@ -1,5 +1,6 @@
 ﻿using AmongUs.GameOptions;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace HydraMenu
 {
@@ -83,11 +84,87 @@ namespace HydraMenu
 			PlayerControl.LocalPlayer.RpcSetPet(outfit.PetId);
 		}
 
+		public static void AttemptStartMeeting(PlayerControl reporter, NetworkedPlayerInfo target)
+		{
+			Hydra.Log.LogInfo($"Attempting to start a meeting for {reporter.Data.PlayerName}");
+
+			bool hasAnticheat = IsAnticheatPresent();
+
+			if(hasAnticheat && AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started)
+			{
+				Hydra.notifications.Send("Start Meeting", "The game must have started for in order for this feature to work.");
+				return;
+			}
+
+			if(AmongUsClient.Instance.AmHost)
+			{
+				Hydra.Log.LogInfo($"We are the host so we can directly use the StartMeeting RPC");
+
+				if(ShipStatus.Instance == null)
+				{
+					Hydra.notifications.Send("Start Meeting", "There must be a valid instance of ShipStatus for this feature to work.");
+				}
+				else
+				{
+					OpenMeeting(reporter, target);
+				}
+
+				return;
+			}
+
+			Hydra.Log.LogInfo("We are not the host so we have to use the ReportDeadBody RPC");
+
+			if(reporter != PlayerControl.LocalPlayer)
+			{
+				Hydra.notifications.Send("Start Meeting", "You must be the host of the lobby to make another player start a meeting.");
+				return;
+			}
+
+			if(reporter.Data.IsDead)
+			{
+				Hydra.notifications.Send("Start Meeting", "You can only call meetings or report bodies if you are alive.");
+				return;
+			}
+
+			if(hasAnticheat && target != null)
+			{
+				if(!target.IsDead)
+				{
+					Hydra.notifications.Send("Start Meeting", "You can only report bodies of players who have died in this round.");
+					return;
+				}
+
+				if(!DoesDeadBodyExist(target.PlayerId))
+				{
+					Hydra.notifications.Send("Start Meeting", "Unable to find a dead body for this player, you can only report a player's body if they have died this round and their body has not dissolved.");
+					return;
+				}
+			}
+
+			PlayerControl.LocalPlayer.CmdReportDeadBody(target);
+		}
+
 		public static void OpenMeeting(PlayerControl reporter, NetworkedPlayerInfo target)
 		{
 			MeetingRoomManager.Instance.AssignSelf(reporter, target);
 			reporter.RpcStartMeeting(target);
 			HudManager.Instance.OpenMeetingRoom(reporter);
+		}
+
+		public static bool DoesDeadBodyExist(byte playerId)
+		{
+			foreach(Collider2D collider in Physics2D.OverlapCircleAll(new Vector2(0, 0), 99999f, Constants.PlayersOnlyMask))
+			{
+				if(collider.tag != "DeadBody") continue;
+
+				DeadBody bodyComponent = collider.GetComponent<DeadBody>();
+				if(bodyComponent && bodyComponent.ParentId == playerId)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public static void ShapeshiftPlayer(PlayerControl victim, PlayerControl target, bool shouldAnimate = true)
@@ -134,7 +211,9 @@ namespace HydraMenu
 			if(AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay)
 			{
 				return (MapNames)AmongUsClient.Instance.TutorialMapId;
-			} else {
+			}
+			else
+			{
 				return (MapNames)GameOptionsManager.Instance.CurrentGameOptions.MapId;
 			}
 		}

@@ -33,15 +33,7 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Call Meeting"))
 			{
-				if(AmongUsClient.Instance.AmHost)
-				{
-					Hydra.Log.LogInfo("We are the host, we can force a meeting");
-					Utilities.OpenMeeting(PlayerControl.LocalPlayer, null);
-				}
-				else
-				{
-					PlayerControl.LocalPlayer.CmdReportDeadBody(null);
-				}
+				Utilities.AttemptStartMeeting(PlayerControl.LocalPlayer, null);
 			}
 
 			if(GUILayout.Button("Complete All Tasks"))
