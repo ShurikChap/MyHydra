@@ -303,7 +303,7 @@ namespace HydraMenu.ui.sections
 			batch.FinishBatch();
 		}
 
-		private static void TPTo(PlayerControl target)
+		public static void TPTo(PlayerControl target)
 		{
 			Network.BatchedMessage batch = new Network.BatchedMessage();
 			batch.UseAnticheatBypass();
