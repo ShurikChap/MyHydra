@@ -173,7 +173,16 @@ namespace HydraMenu
 				}
 			}
 
-			reporter.CmdReportDeadBody(target);
+			Network.BatchedMessage batch = new Network.BatchedMessage();
+
+			if(Self.UseBypassRpc)
+			{
+				batch.UseAnticheatBypass();
+			}
+
+			batch.QueueReportDeadBody(reporter, target);
+
+			batch.FinishBatch();
 		}
 
 		public static void OpenMeeting(PlayerControl reporter, NetworkedPlayerInfo target)

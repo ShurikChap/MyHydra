@@ -154,6 +154,21 @@ namespace HydraMenu
 				writer.EndMessage();
 			}
 
+			public void QueueReportDeadBody(PlayerControl source, NetworkedPlayerInfo target)
+			{
+				if(AmongUsClient.Instance.AmHost)
+				{
+					source.ReportDeadBody(target);
+					return;
+				}
+
+				writer.StartMessage((byte)GameDataTypes.RpcFlag);
+				writer.WritePacked(source.NetId);
+				writer.Write((byte)RpcCalls.ReportDeadBody);
+				writer.Write(target != null ? target.PlayerId : 255);
+				writer.EndMessage();
+			}
+
 			public void QueueMurderPlayer(PlayerControl source, PlayerControl target, MurderResultFlags result)
 			{
 				source.MurderPlayer(target, result);
