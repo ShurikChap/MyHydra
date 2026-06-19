@@ -179,13 +179,25 @@ namespace HydraMenu.ui.sections
 				batch.FinishBatch();
 			}
 
+			GUILayout.BeginHorizontal();
 			if(GUILayout.Button("Kick"))
+			{
+				Network.BatchedMessage batch = new Network.BatchedMessage(AmongUsClient.Instance.HostId);
+				batch.UseAnticheatBypass();
+				batch.QueueAddVote(1, target.OwnerId);
+				batch.QueueAddVote(2, target.OwnerId);
+				batch.QueueAddVote(3, target.OwnerId);
+				batch.FinishBatch();
+			}
+
+			if(GUILayout.Button("Ban"))
 			{
 				Network.BatchedMessage batch = new Network.BatchedMessage(target.OwnerId);
 				batch.UseAnticheatBypass();
 				batch.QueueCheckName(PlayerControl.LocalPlayer, PlayerControl.LocalPlayer.Data.PlayerName);
 				batch.FinishBatch();
 			}
+			GUILayout.EndHorizontal();
 
 			GUILayout.Space(5);
 			GUILayout.Label("Host Only Features:" + (AmongUsClient.Instance.AmHost ? "" : "\n(Using these will get you kicked!)"));

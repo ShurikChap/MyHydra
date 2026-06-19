@@ -61,7 +61,7 @@ namespace HydraMenu.ui.sections
 			{
 				Network.BatchedMessage batch = new Network.BatchedMessage();
 				batch.UseAnticheatBypass();
-				batch.QueueSetRole(PlayerControl.LocalPlayer, RoleTypes.Phantom, false);
+				batch.QueueSetRole(PlayerControl.LocalPlayer, selectedRole, true);
 				batch.FinishBatch();
 			}
 

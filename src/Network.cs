@@ -51,28 +51,15 @@ namespace HydraMenu
 
 		public static void SendDataFlag(uint netId, MessageWriter msg, int targetClientId = -1)
 		{
-			MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+			BatchedMessage batch = new BatchedMessage(targetClientId);
+			batch.UseAnticheatBypass();
 
-			if(targetClientId == -1)
-			{
-				writer.StartMessage(InnerNet.Tags.GameData);
-				writer.Write(AmongUsClient.Instance.GameId);
-			}
-			else
-			{
-				writer.StartMessage(InnerNet.Tags.GameDataTo);
-				writer.Write(AmongUsClient.Instance.GameId);
-				writer.WritePacked(targetClientId);
-			}
+			batch.writer.StartMessage((byte)GameDataTypes.DataFlag);
+			batch.writer.WritePacked(netId);
+			batch.writer.Write(msg, false);
+			batch.writer.EndMessage();
 
-			writer.StartMessage((byte)GameDataTypes.DataFlag);
-			writer.WritePacked(netId);
-			writer.Write(msg, false);
-			writer.EndMessage();
-
-			writer.EndMessage();
-			AmongUsClient.Instance.SendOrDisconnect(writer);
-			writer.Recycle();
+			batch.FinishBatch();
 		}
 
 		public class BatchedMessage
@@ -99,10 +86,7 @@ namespace HydraMenu
 			public void UseAnticheatBypass()
 			{
 				writer.StartMessage((byte)GameDataTypes.DataFlag);
-				writer.WritePacked(PlayerControl.LocalPlayer.NetTransform.NetId);
 				writer.Write(0);
-				writer.Write(100);
-				writer.Write("Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women and blessed is the fruit of thy womb Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen.");
 				writer.EndMessage();
 			}
 
@@ -248,6 +232,18 @@ namespace HydraMenu
 				writer.Write(ejectedPlayer.PlayerId);
 				writer.Write(isTie);
 
+				writer.EndMessage();
+			}
+
+			public void QueueAddVote(int sourceId, int targetId)
+			{
+				VoteBanSystem.Instance.AddVote(sourceId, targetId);
+
+				writer.StartMessage((byte)GameDataTypes.RpcFlag);
+				writer.WritePacked(VoteBanSystem.Instance.NetId);
+				writer.Write((byte)RpcCalls.AddVote);
+				writer.Write(sourceId);
+				writer.Write(targetId);
 				writer.EndMessage();
 			}
 
