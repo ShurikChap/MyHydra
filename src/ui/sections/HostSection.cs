@@ -47,10 +47,7 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Kill Everyone"))
 			{
-				foreach(PlayerControl player in PlayerControl.AllPlayerControls)
-				{
-					PlayerControl.LocalPlayer.RpcMurderPlayer(player, true);
-				}
+				KillAllPlayers();
 			}
 
 			GUILayout.BeginHorizontal();
@@ -174,6 +171,32 @@ namespace HydraMenu.ui.sections
 
 			GUILayout.Label($"Color randomization delay: {Hydra.routines.discoHost.randomizationDelay:F2}s");
 			Hydra.routines.discoHost.randomizationDelay = GUILayout.HorizontalSlider(Hydra.routines.discoHost.randomizationDelay, 0.1f, 2.0f);
+		}
+
+		private static void KillAllPlayers()
+		{
+			bool hasAnticheat = Utilities.IsAnticheatPresent();
+
+			if(hasAnticheat && AmongUsClient.Instance.GameState != InnerNetClient.GameStates.Started)
+			{
+				Hydra.notifications.Send("Murder Player", "This feature can only be used once the game has started");
+				return;
+			}
+
+			if(hasAnticheat && !AmongUsClient.Instance.AmHost)
+			{
+				Hydra.notifications.Send("Murder Player", "This feature can only be used if you are the host of the lobby");
+				return;
+			}
+
+			Network.BatchedMessage batch = new Network.BatchedMessage();
+
+			foreach(PlayerControl player in PlayerControl.AllPlayerControls)
+			{
+				batch.QueueMurderPlayer(PlayerControl.LocalPlayer, player, MurderResultFlags.Succeeded);
+			}
+
+			batch.FinishBatch();
 		}
 
 		private static IEnumerator SpawnMap(byte mapId)
