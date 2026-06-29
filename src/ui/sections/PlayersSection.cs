@@ -208,16 +208,16 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Eject"))
 			{
+				Network.BatchedMessage batch = new Network.BatchedMessage();
+
 				if(MeetingHud.Instance == null)
 				{
 					MeetingHud.Instance = UnityEngine.Object.Instantiate<MeetingHud>(HudManager.Instance.MeetingPrefab);
-					AmongUsClient.Instance.Spawn(MeetingHud.Instance, -2, SpawnFlags.None);
+					batch.QueueSpawn(MeetingHud.Instance, -2, SpawnFlags.None);
 				}
 
-				// Show the Exile screen with the player being ejected
 				MeetingHud.VoterState[] votes = Array.Empty<MeetingHud.VoterState>();
 
-				Network.BatchedMessage batch = new Network.BatchedMessage();
 				batch.QueueVotingComplete(votes, target.Data, false);
 				// If we created a MeetingHud object then it will be destroyed by the RpcClose function
 				batch.QueueCloseMeeting();
