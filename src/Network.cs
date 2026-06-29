@@ -85,6 +85,12 @@ namespace HydraMenu
 				writer.EndMessage();
 			}
 
+			public void QueueSpawn(InnerNetObject netObject, int ownerId = -2, SpawnFlags flags = SpawnFlags.None)
+			{
+				SpawnGameDataMessage spawn = AmongUsClient.Instance.CreateSpawnMessage(netObject, ownerId, flags);
+				spawn.Serialize(writer);
+			}
+
 			public void QueueDataFlag(uint netId, MessageWriter msg)
 			{
 				writer.StartMessage((byte)GameDataTypes.DataFlag);

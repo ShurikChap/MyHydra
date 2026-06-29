@@ -180,11 +180,23 @@ namespace HydraMenu.ui.sections
 		{
 			Hydra.Log.LogInfo($"Attempting to spawn in map id {mapId}");
 
+			// The Utilities::IsAnticheatPresent function does not work perfectly here
+			// We are able to spawn in any maps we want without host in local, or even skeld.net lobbies
+			// however +25 modded protocol lobbies, while having much of their anticheat checks disabled, still has checks against non-hosts sending spawn messages
+			if(Utilities.IsAnticheatPresent() && !AmongUsClient.Instance.AmHost)
+			{
+				Hydra.notifications.Send("Map Spawner", "This feature can only be used if you are the host of the lobby.");
+				yield break;
+			}
+
 			AsyncOperationHandle<GameObject> asyncHandle = AmongUsClient.Instance.ShipPrefabs[mapId].InstantiateAsync(null, false);
 			yield return asyncHandle;
 
 			ShipStatus ship = asyncHandle.Result.GetComponent<ShipStatus>();
-			AmongUsClient.Instance.Spawn(ship, -2, SpawnFlags.None);
+
+			Network.BatchedMessage batch = new Network.BatchedMessage();
+			batch.QueueSpawn(ship, -2, SpawnFlags.None);
+			batch.FinishBatch();
 
 			Hydra.notifications.Send("Map Spawner", $"{(MapNames)mapId} has been spawned.", 5);
 		}

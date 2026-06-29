@@ -194,8 +194,10 @@ namespace HydraMenu.ui.sections
 					{
 						MeetingHud.VoterState state = array[i];
 
-						state.VoterId = (byte)(PlayerControl.AllPlayerControls.Count % 15);
+						state.VoterId = (byte)i;
 						state.VotedForId = target.PlayerId;
+
+						array[i] = state;
 					}
 
 					Network.BatchedMessage batch = new Network.BatchedMessage();

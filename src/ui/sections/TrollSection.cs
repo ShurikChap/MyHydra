@@ -1,5 +1,4 @@
-﻿using AmongUs.GameOptions;
-using HydraMenu.features;
+﻿using HydraMenu.features;
 using UnityEngine;
 
 namespace HydraMenu.ui.sections
@@ -45,7 +44,7 @@ namespace HydraMenu.ui.sections
 				}
 			}
 
-			GUIStyle.Space(5);
+			GUILayout.Space(5);
 
 			// Automatically close and open all doors at a set interval
 			GUILayout.Label("Door Troller:");
