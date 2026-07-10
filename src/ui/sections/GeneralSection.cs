@@ -17,6 +17,11 @@ namespace HydraMenu.ui.sections
 				Hydra.notifications.ClearNotifications();
 				Hydra.notifications.Send("Notifications", "All notifications have been cleared.", 5);
 			}
+			if(GUILayout.Button("Test Notification System"))
+			{
+				System.Random random = new System.Random();
+				Hydra.notifications.Send("Test", $"The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. The quick brown fox jumped over the lazy dog. {random.Next(0, 100)}");
+			}
 		}
 	}
 }
