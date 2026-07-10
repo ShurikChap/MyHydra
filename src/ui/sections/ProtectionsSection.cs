@@ -14,6 +14,7 @@ namespace HydraMenu.ui.sections
 			Protections.BlockServerTeleports.Enabled = GUILayout.Toggle(Protections.BlockServerTeleports.Enabled, "Block position updates from server");
 
 			// Overloads
+			Protections.BlockLargeGameMessages = GUILayout.Toggle(Protections.BlockLargeGameMessages, "Block Large Game Messages");
 			Protections.HardenedReadPackedUInt.Enabled = GUILayout.Toggle(Protections.HardenedReadPackedUInt.Enabled, "Use hardened packed int deserializer");
 			Protections.MemoryAllocationOverload.Enabled = GUILayout.Toggle(Protections.MemoryAllocationOverload.Enabled, "Protect against VotingComplete overloads");
 

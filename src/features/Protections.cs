@@ -7,6 +7,8 @@ namespace HydraMenu.features
 {
 	internal class Protections
 	{
+		public static bool BlockLargeGameMessages { get; set; } = true;
+
 		[HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.SetEndpoint))]
 		public static class ForceDTLS
 		{
