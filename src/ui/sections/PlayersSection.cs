@@ -2,6 +2,7 @@
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HydraMenu.features;
+using HydraMenu.network;
 using InnerNet;
 using System;
 using System.Collections;
@@ -219,7 +220,7 @@ namespace HydraMenu.ui.sections
 						array[i] = state;
 					}
 
-					Network.BatchedMessage batch = new Network.BatchedMessage();
+					BatchedMessage batch = new BatchedMessage();
 					batch.QueueVotingComplete(array, target.Data, false);
 					batch.FinishBatch();
 				}
@@ -227,7 +228,7 @@ namespace HydraMenu.ui.sections
 
 			if(GUILayout.Button("Eject"))
 			{
-				Network.BatchedMessage batch = new Network.BatchedMessage();
+				BatchedMessage batch = new BatchedMessage();
 
 				if(MeetingHud.Instance == null)
 				{
@@ -265,14 +266,14 @@ namespace HydraMenu.ui.sections
 					taskIds[i] = i;
 				}
 
-				Network.BatchedMessage batch = new Network.BatchedMessage();
+				BatchedMessage batch = new BatchedMessage();
 				batch.QueueSetTasks(target.Data, taskIds);
 				batch.FinishBatch();
 			}
 
 			if(GUILayout.Button("Clear Tasks"))
 			{
-				Network.BatchedMessage batch = new Network.BatchedMessage();
+				BatchedMessage batch = new BatchedMessage();
 				batch.QueueSetTasks(target.Data, Array.Empty<byte>());
 				batch.FinishBatch();
 			}

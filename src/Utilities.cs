@@ -1,4 +1,5 @@
 ﻿using AmongUs.GameOptions;
+using HydraMenu.network;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -89,7 +90,7 @@ namespace HydraMenu
 
 			bool hasAnticheat = IsAnticheatPresent();
 
-			Network.BatchedMessage batch = new Network.BatchedMessage();
+			BatchedMessage batch = new BatchedMessage();
 
 			// We cannot change the name of our player in server-authoritative lobbies, even as the host
 			if(!hasAnticheat)
@@ -168,7 +169,7 @@ namespace HydraMenu
 				}
 			}
 
-			Network.BatchedMessage batch = new Network.BatchedMessage();
+			BatchedMessage batch = new BatchedMessage();
 			batch.QueueReportDeadBody(reporter, target);
 			batch.FinishBatch();
 		}
@@ -212,7 +213,7 @@ namespace HydraMenu
 				return;
 			}
 
-			Network.BatchedMessage batch = new Network.BatchedMessage();
+			BatchedMessage batch = new BatchedMessage();
 
 			// The vanilla anticheat will ban the host if they attempt to send the Shapeshift RPC for a player whose role is not Shapeshifter
 			// To get around this, we temporarily change the player's role to Shapeshifter, make them shapeshift, and revert them back to their previous role

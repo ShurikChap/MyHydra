@@ -1,6 +1,7 @@
 ﻿using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
+using HydraMenu.network;
 using Il2CppSystem.Collections.Generic;
 using InnerNet;
 using UnityEngine.AddressableAssets;
@@ -140,7 +141,7 @@ namespace HydraMenu.features
 				systemUpdate.Write(operation == 1);
 				systemUpdate.EndMessage();
 
-				Network.BatchedMessage batch = new Network.BatchedMessage(player.OwnerId);
+				BatchedMessage batch = new BatchedMessage();
 				batch.QueueDataFlag(ShipStatus.Instance.NetId, systemUpdate);
 				batch.FinishBatch();
 			}

@@ -1,4 +1,4 @@
-﻿using HydraMenu.features;
+﻿using HydraMenu.network;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +19,7 @@ namespace HydraMenu.routines
 			timeElapsed += Time.deltaTime;
 			if(timeElapsed < randomizationDelay) return;
 
-			Network.BatchedMessage batch = new Network.BatchedMessage();
+			BatchedMessage batch = new BatchedMessage();
 
 			foreach(PlayerControl player in PlayerControl.AllPlayerControls)
 			{
