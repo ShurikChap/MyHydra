@@ -76,7 +76,7 @@ namespace HydraMenu
 			{ "Records", new Vector2(19.86f, 10.07f ) },
 			{ "Showers", new Vector2(20.88f, 0.48f ) },
 			{ "Main Hall", new Vector2(10.77f, -0.13f ) },
-			{ "Brig", new Vector2(-0.44f, 8.66f ) },
+			{ "Brig", new Vector2(-0.94f, 8.66f ) },
 			{ "Vault", new Vector2(-8.78f, 8.13f ) },
 			{ "Gap Room", new Vector2(4.15f, 8.73f ) },
 			{ "Meeting Room", new Vector2(11.03f, 16.06f ) },
