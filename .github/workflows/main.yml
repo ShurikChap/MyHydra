@@ -29,26 +29,55 @@ jobs:
       - name: Build Debug
         run: dotnet build -c Debug
 
+      - name: Package builds
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+
+          foreach ($configuration in @("Release", "Debug")) {
+            $stage = "artifacts/$configuration"
+            New-Item -ItemType Directory -Force -Path $stage | Out-Null
+
+            $directories = Get-ChildItem -Path . -Directory -Recurse -Filter $configuration |
+              Where-Object { $_.Parent.Name -eq "bin" }
+
+            if (-not $directories) {
+              throw "No $configuration build output found!"
+            }
+
+            foreach ($directory in $directories) {
+              $project = Split-Path (Split-Path $directory.FullName -Parent) -Leaf
+              $destination = Join-Path $stage $project
+
+              New-Item -ItemType Directory -Force -Path $destination | Out-Null
+
+              Copy-Item -Path "$($directory.FullName)/*" `
+                -Destination $destination -Recurse -Force
+            }
+
+            Compress-Archive -Path "$stage/*" `
+              -DestinationPath "artifacts/HydraMenu-$configuration.zip" -Force
+          }
+
       - name: Generate tag
         id: tag
-        shell: bash
+        shell: pwsh
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=build-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
-          fi
+          if ($env:GITHUB_REF.StartsWith("refs/tags/")) {
+            $tag = $env:GITHUB_REF.Substring(10)
+          } else {
+            $tag = "build-$env:GITHUB_RUN_NUMBER"
+          }
+
+          "tag=$tag" >> $env:GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          target_commitish: ${{ github.sha }}
           files: |
-            **/bin/Release/**/*.dll
-            **/bin/Release/**/*.json
-            **/bin/Release/**/*.pdb
-            **/bin/Debug/**/*.dll
-            **/bin/Debug/**/*.json
-            **/bin/Debug/**/*.pdb
+            artifacts/HydraMenu-Release.zip
+            artifacts/HydraMenu-Debug.zip
           generate_release_notes: true
+          overwrite_files: true
+          preserve_order: true
